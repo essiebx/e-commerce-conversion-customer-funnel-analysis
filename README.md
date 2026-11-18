@@ -170,7 +170,3 @@ python -m unittest discover -s tests -v
 ## License
 
 MIT License. See [LICENSE](LICENSE).
-
-## Author
-
-Essie B.
