@@ -2,7 +2,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB.svg)](https://www.python.org/) [![SQL](https://img.shields.io/badge/SQL-Analysis-336791.svg)](https://www.postgresql.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A reproducible portfolio project analyzing a multi-stage e-commerce journey to identify funnel drop-offs, estimate lost revenue, and prioritize commercial experiments.
+A reproducible project analyzing a multi-stage e-commerce journey to identify funnel drop-offs, estimate lost revenue, and prioritize commercial experiments.
 
 ## Business Objective
 
