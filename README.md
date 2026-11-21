@@ -1,93 +1,112 @@
-# E-Commerce Conversion & Customer Funnel Analysis
+# Customer Funnel Analysis
 
-[![Python](https://img.shields.io/badge/Python-3.10+-3776AB.svg)](https://www.python.org/) [![SQL](https://img.shields.io/badge/SQL-Analysis-336791.svg)](https://www.postgresql.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB.svg)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A reproducible project analyzing a public, non-synthetic e-commerce event dataset to identify funnel drop-offs and estimate commercial revenue opportunities.
+## Project Overview
+
+This project analyzes customer funnel performance to understand customer behavior, identify conversion bottlenecks, and generate actionable business insights.
+
+The analysis tracks customers through the funnel, measures stage-by-stage conversion and drop-off rates, and identifies opportunities to improve customer acquisition and retention.
 
 ## Business Objective
 
-Measure conversion across:
+The default analysis measures conversion across:
 
-`product view → cart addition → purchase`
+```text
+product view → cart addition → purchase
+```
 
-The Retailrocket data does not provide campaign landing pages, checkout events, campaign attribution, acquisition channels, devices, or transaction values. These fields are therefore not fully available in the ingested funnel. The project retains the original schema for compatibility, but unknown attribution fields are marked as `unknown`.
-
-The analysis helps answer:
+It helps answer:
 
 - Where do users abandon the journey?
 - How much is the approximate purchase opportunity?
-- Which behavioral segments offer the strongest recovery opportunity?
-- What experiments should teams prioritize first?
+- Which available behavioral segments offer the strongest recovery opportunity?
+- Which experiments should teams prioritize first?
 
-## Data Source
-
-This project uses the public **Retailrocket e-commerce event dataset**.
-
-The ingestion pipeline downloads the event archive and maps supported Retailrocket events as follows:
-
-| Retailrocket event | Project funnel stage |
-|---|---|
-| `view` | `product_view` |
-| `addtocart` | `cart` |
-| `transaction` | `purchase` |
-
-Download and ingest the data with:
-
-```bash
-python scripts/ingest_retailrocket.py
-```
-
-To ingest an existing `events.csv` file instead:
-
-```bash
-python scripts/ingest_retailrocket.py --events-file /path/to/events.csv
-```
-
-The default normalized output is:
-
-```text
-data/ecommerce_funnel_events.csv
-```
-
-Raw downloaded files are stored beneath `data/raw/retailrocket/`. Because the source is anonymized public event data rather than synthetic demonstration data, campaign, channel, and device values are recorded as `unknown`. Retailrocket transaction rows also do not provide monetary order values, so revenue and cart value are normalized to `1.00` as a purchase indicator—not as real currency values.
-
-## Key Metrics
-
-- Stage conversion rate
-- Step-by-step drop-off rate
-- Overall product-view-to-purchase conversion
-- Estimated recoverable purchase opportunity
-- Completion rate by available segment
-
-> Revenue opportunity is a directional estimate, not a currency forecast. Retailrocket does not include order totals, campaign attribution, or landing/checkout events. The existing calculation uses a normalized revenue value of `1.00` per purchase.
+The Retailrocket source does not provide campaign landing pages, checkout events, campaign attribution, acquisition channels, devices, or transaction values. Unknown attribution fields are retained in the normalized schema as `unknown`, and transaction values are normalized for analysis only.
 
 ## Project Structure
 
 ```text
 .
 ├── data/
-│   ├── raw/retailrocket/
+│   ├── raw/                      # Original datasets, excluded from Git
+│   ├── processed/                # Cleaned and transformed datasets
 │   ├── ecommerce_funnel_events.csv
 │   └── README.md
 ├── notebooks/
 │   └── funnel_analysis.ipynb
-├── reports/
+├── reports/                      # Generated analysis reports
 ├── scripts/
-│   ├── ingest_retailrocket.py
-│   ├── generate_sample_data.py
-│   └── analyze_funnel.py
+│   ├── ingest_retailrocket.py    # Retailrocket ingestion pipeline
+│   ├── generate_sample_data.py   # Synthetic demonstration data
+│   └── analyze_funnel.py         # Funnel metrics and charts
 ├── sql/
 │   ├── schema.sql
 │   └── funnel_analysis.sql
 ├── tests/
 │   └── test_funnel_logic.py
-├── .gitignore
 ├── LICENSE
 ├── requirements.txt
 └── README.md
 ```
 
-## Quick Start
+## Data Management
+
+The project separates raw and processed datasets to maintain data integrity and reproducibility.
+
+| Directory | Description | Git Tracking |
+|---|---|---|
+| `data/raw/` | Original, unmodified datasets | Excluded |
+| `data/processed/` | Cleaned and transformed datasets | Excluded by default |
+| `data/README.md` | Data sources, descriptions, and setup instructions | Tracked |
+
+### Data Guidelines
+
+- Keep original datasets in `data/raw/`.
+- Never modify raw datasets directly.
+- Store cleaned and transformed datasets in `data/processed/`.
+- Document dataset sources, formats, and relevant data dictionaries.
+- Do not commit confidential, sensitive, or personally identifiable information.
+- Use scripts in `scripts/` or a future pipeline to reproduce processed datasets.
+
+## Obtaining the Data
+
+Raw datasets are not included in this repository. Obtain the required dataset from its authorized source and place it in `data/raw/`.
+
+This project uses the public **Retailrocket e-commerce event dataset**. The ingestion pipeline downloads the event archive or accepts an existing `events.csv` file.
+
+| Retailrocket event | Funnel stage |
+|---|---|
+| `view` | `product_view` |
+| `addtocart` | `cart` |
+| `transaction` | `purchase` |
+
+Download and ingest the public dataset:
+
+```bash
+python scripts/ingest_retailrocket.py
+```
+
+To ingest an existing events file:
+
+```bash
+python scripts/ingest_retailrocket.py --events-file /path/to/events.csv
+```
+
+The normalized output is written to `data/ecommerce_funnel_events.csv`. Raw downloaded files remain beneath `data/raw/retailrocket/`.
+
+## Technologies Used
+
+- Python
+- Pandas
+- NumPy
+- Matplotlib
+- SQL
+- Git and GitHub
+- Jupyter Notebook
+
+## Installation and Setup
 
 ### 1. Clone the repository
 
@@ -100,8 +119,20 @@ cd e-commerce-conversion-customer-funnel-analysis
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate       # macOS/Linux
-.venv\Scripts\activate          # Windows
+```
+
+Activate it:
+
+**Linux/macOS:**
+
+```bash
+source .venv/bin/activate
+```
+
+**Windows:**
+
+```bash
+.venv\Scripts\activate
 ```
 
 ### 3. Install dependencies
@@ -110,20 +141,41 @@ source .venv/bin/activate       # macOS/Linux
 pip install -r requirements.txt
 ```
 
-### 4. Ingest data and run the analysis
+## Running the Project
+
+Ingest the public Retailrocket data and run the analysis:
 
 ```bash
 python scripts/ingest_retailrocket.py
 python scripts/analyze_funnel.py
 ```
 
-The synthetic generator remains available for reproducible demonstrations:
+A synthetic generator remains available for reproducible demonstrations:
 
 ```bash
 python scripts/generate_sample_data.py
 ```
 
-Running it overwrites `data/ecommerce_funnel_events.csv`, so rerun the Retailrocket ingestion pipeline before non-synthetic analysis.
+Running the generator overwrites `data/ecommerce_funnel_events.csv`. Rerun the Retailrocket ingestion pipeline before performing non-synthetic analysis.
+
+## Analysis Workflow
+
+1. Collect or download the source events.
+2. Validate the required fields and funnel stages.
+3. Normalize supported events.
+4. Deduplicate unique visitors at each stage.
+5. Calculate stage-to-stage and overall conversion.
+6. Identify absolute and percentage drop-offs.
+7. Report available segment performance and recovery opportunity.
+8. Generate business insights and experiments.
+
+## Key Metrics
+
+- Stage conversion rate
+- Step-by-step drop-off rate
+- Overall product-view-to-purchase conversion
+- Estimated recoverable purchase opportunity
+- Completion rate by available segment
 
 Reports are written to `reports/`:
 
@@ -137,54 +189,26 @@ Reports are written to `reports/`:
 | Column | Description |
 |---|---|
 | `event_id` | Unique normalized event identifier |
-| `user_id` | Visitor identifier normalized as `VIS-...` |
-| `session_id` | Current ingestion uses the visitor identifier as a session fallback |
-| `event_timestamp` | ISO-8601 UTC event timestamp derived from Retailrocket milliseconds |
+| `user_id` | Anonymized visitor identifier |
+| `session_id` | Session identifier; currently falls back to the visitor identifier |
+| `event_timestamp` | ISO-8601 UTC event timestamp |
 | `campaign` | Attribution campaign; `unknown` for Retailrocket |
 | `channel` | Acquisition channel; `unknown` for Retailrocket |
 | `device` | User device category; `unknown` for Retailrocket |
-| `stage` | Normalized funnel stage: `product_view`, `cart`, or `purchase` |
-| `cart_value` | `1.00` on purchase rows; `0.00` otherwise. This is not a real basket value. |
-| `revenue` | `1.00` on purchase rows; `0.00` otherwise. This is a purchase indicator, not currency revenue. |
-
-## Analysis Method
-
-1. Download or load the Retailrocket event data.
-2. Normalize supported events to the project funnel schema.
-3. Validate required columns and normalized funnel stages.
-4. Count unique visitors by funnel stage.
-5. Calculate stage-to-stage and overall conversion.
-6. Identify absolute and percentage drop-offs.
-7. Report available segment performance and normalized recovery opportunity.
+| `stage` | Normalized funnel stage |
+| `cart_value` | `1.00` on purchase rows; `0.00` otherwise |
+| `revenue` | `1.00` on purchase rows; `0.00` otherwise; a purchase indicator, not actual currency |
 
 ## SQL Workflow
 
-Use `sql/schema.sql` to create a compatible analytics table, then run `sql/funnel_analysis.sql` for a SQL-native funnel query.
+Create the compatible analytics table and run the SQL-native funnel query:
 
 ```bash
 psql -d ecommerce -f sql/schema.sql
 psql -d ecommerce -f sql/funnel_analysis.sql
 ```
 
-The SQL uses conditional aggregation and deduplicates visitors by stage, making results reliable even if a session contains repeated events.
-
-## Example Outputs
-
-| Metric | Interpretation |
-|---|---|
-| Product-view users | Visitors reaching at least one product view |
-| Step conversion | Percentage advancing to the next available stage |
-| Drop-off count | Visitors lost between consecutive observed stages |
-| Recovery opportunity | Potential purchase count or normalized value based on observed purchases |
-
-## Use in a Spreadsheet
-
-The CSV reports can be opened directly in Excel or Google Sheets:
-
-1. Open `reports/funnel_summary.csv` for stage KPIs.
-2. Filter `reports/segment_summary.csv` where attribution fields are available.
-3. Sort `reports/revenue_opportunity.csv` from largest to smallest normalized opportunity.
-4. Use a funnel or waterfall chart to visualize drop-offs.
+The query uses conditional aggregation and deduplicates visitors by stage.
 
 ## Testing
 
@@ -194,19 +218,22 @@ python -m unittest discover -s tests -v
 
 ## Recommended Experiments
 
-- Analyze the largest observed transition drop-off, such as product view to cart.
 - Improve product-page relevance and reduce friction before add-to-cart.
 - Test cart reminders or follow-up experiences for visitors who reach the cart stage.
-- Use holdout groups and compare incremental behavior rather than only conversion rate.
+- Analyze the largest observed transition drop-off.
+- Use holdout groups and compare incremental behavior rather than conversion rate alone.
 
 ## Limitations
 
-- The primary data is public anonymized Retailrocket event data, not company-owned warehouse data.
-- Retailrocket does not provide campaign landing, campaign attribution, channel, device, checkout, or currency value fields.
-- The ingestion pipeline normalizes purchases to a value of `1.00` because transaction totals are unavailable.
-- Funnel analysis assumes one record per relevant stage per visitor journey and does not infer omitted sessions.
-- Revenue recovery estimates do not account for probability uncertainty or marketing costs.
-- Replace the public dataset with warehouse data and configure attribution windows before production use.
+- Retailrocket is public anonymized event data, not company-owned warehouse data.
+- It does not provide campaign landing pages, checkout events, campaign attribution, channel, device, or currency value fields.
+- Purchases are normalized to `1.00` because transaction totals are unavailable.
+- Revenue recovery estimates are directional and do not include probability uncertainty or marketing costs.
+- Before production use, replace the public dataset with warehouse data and configure attribution windows.
+
+## Contributing
+
+Contributions, suggestions, and improvements are welcome. Please open an issue or submit a pull request that follows the repository's conventions.
 
 ## License
 

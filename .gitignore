@@ -6,3 +6,8 @@ venv/
 .env
 .DS_Store
 .ipynb_checkpoints/
+data/raw/*
+!data/raw/.gitkeep
+
+data/processed/*
+!data/processed/.gitkeep
