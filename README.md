@@ -29,23 +29,38 @@ The Retailrocket source does not provide campaign landing pages, checkout events
 
 ```text
 .
+├── bi/                           # BI and dashboard definitions
+├── config/                       # Pipeline configuration
 ├── data/
 │   ├── raw/                      # Original datasets, excluded from Git
-│   ├── processed/                # Cleaned and transformed datasets
+│   ├── processed/                # Cleaned datasets
 │   ├── ecommerce_funnel_events.csv
 │   └── README.md
+├── generator/
+│   └── generate_data.py          # Synthetic data generator
 ├── notebooks/
-│   └── funnel_analysis.ipynb
+│   ├── 01_data_exploration.ipynb
+│   ├── 02_data_quality_analysis.ipynb
+│   ├── 03_customer_funnel_analysis.ipynb
+│   ├── 04_conversion_analysis.ipynb
+│   └── 05_business_insights.ipynb
+├── pipeline/
+│   ├── ingestion/
+│   │   ├── extract.py
+│   │   └── validate_source.py
+│   ├── transformation/
+│   │   ├── clean_data.py
+│   │   └── transform_data.py
+│   └── orchestration/
+│       └── run_pipeline.py
 ├── reports/                      # Generated analysis reports
 ├── scripts/
-│   ├── ingest_retailrocket.py    # Retailrocket ingestion pipeline
-│   ├── generate_sample_data.py   # Synthetic demonstration data
-│   └── analyze_funnel.py         # Funnel metrics and charts
+│   └── analyze_funnel.py         # Existing funnel reporting entry point
 ├── sql/
-│   ├── schema.sql
-│   └── funnel_analysis.sql
+│   ├── staging/
+│   ├── transformations/
+│   └── analysis/
 ├── tests/
-│   └── test_funnel_logic.py
 ├── LICENSE
 ├── requirements.txt
 └── README.md
@@ -143,10 +158,29 @@ pip install -r requirements.txt
 
 ## Running the Project
 
-Ingest the public Retailrocket data and run the analysis:
+Run the final modular pipeline:
+
+```bash
+python pipeline/orchestration/run_pipeline.py --source retailrocket
+```
+
+To run against an existing Retailrocket events file:
+
+```bash
+python pipeline/orchestration/run_pipeline.py --source retailrocket --events-file /path/to/events.csv
+```
+
+Run the reproducible synthetic workflow:
+
+```bash
+python pipeline/orchestration/run_pipeline.py --source synthetic --users 5000 --seed 42
+```
+
+Legacy convenience scripts remain available:
 
 ```bash
 python scripts/ingest_retailrocket.py
+python scripts/generate_sample_data.py
 python scripts/analyze_funnel.py
 ```
 

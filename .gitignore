@@ -11,3 +11,25 @@ data/raw/*
 
 data/processed/*
 !data/processed/.gitkeep
+
+data/ecommerce_funnel_events.csv
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Environment variables
+.env
+
+# Data
+data/raw/*
+data/processed/*
+data/transformed/*
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Generated outputs
+*.log
+.DS_Store

@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS ecommerce_funnel_events (
     campaign VARCHAR(100) NOT NULL,
     channel VARCHAR(100) NOT NULL,
     device VARCHAR(50) NOT NULL,
-    stage VARCHAR(50) NOT NOT NULL,
+    stage VARCHAR(50) NOT NULL,
     cart_value NUMERIC(12, 2) DEFAULT 0,
     revenue NUMERIC(12, 2) DEFAULT 0
 );

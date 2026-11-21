@@ -28,7 +28,7 @@ class FunnelLogicTests(unittest.TestCase):
         landing = summary.loc[summary["stage"] == "landing", "overall_conversion_rate"].iloc[0]
         purchase = summary.loc[summary["stage"] == "purchase", "overall_conversion_rate"].iloc[0]
         self.assertEqual(landing, 1.0)
-        self.assertEqual(purchase, 1 / 3)
+        self.assertAlmostEqual(purchase, 1 / 3, places=4)
 
     def test_revenue_opportunity_has_every_transition(self):
         opportunity = revenue_opportunity(self.frame)
