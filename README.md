@@ -22,6 +22,39 @@ The pipeline supports two reproducible entry paths: ingesting public Retailrocke
 ## Repository Structure
 
 ```text
+.
+├── bi/                           # BI and dashboard definitions
+├── config/                       # Pipeline configuration
+├── data/
+│   ├── raw/                      # Original datasets, excluded from Git
+│   ├── processed/                # Normalized and cleaned datasets
+│   └── README.md
+├── notebooks/
+│   ├── 01_data_exploration.ipynb
+│   ├── 02_data_quality_analysis.ipynb
+│   ├── 03_customer_funnel_analysis.ipynb
+│   ├── 04_conversion_analysis.ipynb
+│   └── 05_business_insights.ipynb
+├── pipeline/
+│   ├── ingestion/
+│   │   ├── extract.py
+│   │   └── validate_source.py
+│   ├── transformation/
+│   │   ├── clean_data.py
+│   │   └── transform_data.py
+│   └── orchestration/
+│       └── run_pipeline.py
+├── reports/                      # Generated analysis reports
+├── scripts/
+│   └── analyze_funnel.py         # Existing funnel reporting entry point
+├── sql/
+│   ├── staging/
+│   ├── transformations/
+│   └── analysis/
+├── tests/
+├── LICENSE
+├── requirements.txt
+└── README.md
 config/                 Default source, stage, and synthetic-data settings
 data/                   Raw and processed data locations; generated datasets are excluded
 generator/              Seeded synthetic event generator
@@ -65,6 +98,34 @@ The SQL table definition is in [`sql/schema.sql`](sql/schema.sql), while [`sql/f
 
 ## Setup
 
+To ingest an existing events file:
+
+```bash
+python scripts/ingest_retailrocket.py --events-file /path/to/events.csv
+```
+
+The normalized output is written to `data/processed/ecommerce_funnel_events_normalized.csv`. The validated final output is written to `data/processed/ecommerce_funnel_events_clean.csv`. Raw downloaded files remain beneath `data/raw/retailrocket/`.
+
+## Technologies Used
+
+- Python
+- Pandas
+- NumPy
+- Matplotlib
+- SQL
+- Git and GitHub
+- Jupyter Notebook
+
+## Installation and Setup
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/essiebx/e-commerce-conversion-customer-funnel-analysis.git
+cd e-commerce-conversion-customer-funnel-analysis
+```
+
+### 2. Create a virtual environment
 Python 3.10 or newer is recommended.
 
 ```bash
@@ -87,6 +148,34 @@ python scripts/analyze_funnel.py
 
 This writes the normalized and cleaned datasets under `data/` and creates the analysis outputs under `reports/`.
 
+Run the modular pipeline using the extracted Retailrocket events file:
+
+```bash
+python pipeline/orchestration/run_pipeline.py --events-file data/raw/retailrocket/events.csv
+```
+
+Generate dashboard reports from the cleaned processed dataset:
+
+```bash
+python scripts/analyze_funnel.py
+```
+
+Launch the dashboard:
+
+```bash
+python -m streamlit run app.py
+```
+
+## Analysis Workflow
+
+1. Collect or download the source events.
+2. Validate the required fields and funnel stages.
+3. Normalize supported events.
+4. Deduplicate unique visitors at each stage.
+5. Calculate stage-to-stage and overall conversion.
+6. Identify absolute and percentage drop-offs.
+7. Report available segment performance and recovery opportunity.
+8. Generate business insights and experiments.
 A standalone synthetic generator is also available:
 
 ```bash
@@ -154,4 +243,74 @@ The tests cover funnel conversion and revenue-opportunity calculations, Retailro
 
 ## License
 
+MIT License. See [LICENSE](LICENSE).
+
+## Live Dashboard
+
+Launch the Streamlit dashboard locally:
+
+```bash
+python -m pip install -r requirements.txt
+streamlit run app.py
+```
+
+Open the local URL shown by Streamlit, normally `http://localhost:8501`.
+
+The dashboard reads generated files from `reports/`, so run the pipeline and analysis first:
+
+```bash
+python pipeline/orchestration/run_pipeline.py --events-file data/raw/retailrocket/events.csv
+python scripts/analyze_funnel.py
+streamlit run app.py
+```
+
+For Streamlit Community Cloud, deploy `app.py` from the GitHub repository and set the main file path to `app.py`. Processed data is ignored by Git, so generate reports during deployment or add a small hosted dataset workflow before publishing.
+
+## Free Production Deployment
+
+### 1. Publish lightweight reports
+
+Commit the generated files beneath `reports/`; do not commit `data/raw/`, `data/processed/`, or the 286 MB source-derived CSV. The dashboard requires:
+
+- `reports/funnel_summary.csv`
+- `reports/segment_summary.csv`
+- `reports/revenue_opportunity.csv`
+- `reports/manifest.json`
+
+Raw and processed event data remain excluded by `.gitignore`.
+
+### 2. Deploy Streamlit Community Cloud
+
+1. Push this repository to GitHub.
+2. Open Streamlit Community Cloud and select the repository.
+3. Set the main file to `app.py`.
+4. Deploy.
+
+Streamlit Community Cloud is sufficient for this static or periodically refreshed report dashboard.
+
+### 3. Refresh reports
+
+Run reports locally after updating source data:
+
+```bash
+python pipeline/orchestration/run_pipeline.py --events-file data/raw/retailrocket/events.csv
+python scripts/analyze_funnel.py
+```
+
+Commit the updated files beneath `reports/` and redeploy or let Streamlit redeploy automatically.
+
+The repository includes GitHub Actions workflows that:
+
+- Run unit tests on push and pull requests.
+- Provide a manual or scheduled report-refresh job.
+
+Kaggle requires authentication for the source archive, so a public GitHub Action cannot download it without source credentials or a public mirror. Keep credentials out of GitHub and do not commit the raw dataset.
+
+### 4. Production validation checklist
+
+- Confirm every required report exists.
+- Confirm `manifest.json` contains a recent `generated_at_utc` value.
+- Confirm the dashboard uses chronological funnel logic.
+- Confirm no raw, processed, or personally identifiable customer data is committed.
+- Run `python -m unittest discover -s tests -v` before publishing.
 This project is licensed under the [MIT License](LICENSE).

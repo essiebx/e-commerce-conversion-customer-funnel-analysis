@@ -1,35 +1,23 @@
 *.py[cod]
 __pycache__/
-*.pytest_cache/
+*.pyc
+.pytest_cache/
 .venv/
 venv/
 .env
 .DS_Store
 .ipynb_checkpoints/
-data/raw/*
-!data/raw/.gitkeep
-
-data/processed/*
-!data/processed/.gitkeep
-
-data/ecommerce_funnel_events.csv
-# Python
-__pycache__/
-*.py[cod]
-.venv/
-venv/
-
-# Environment variables
-.env
-
-# Data
-data/raw/*
-data/processed/*
-data/transformed/*
-
-# Jupyter
-.ipynb_checkpoints/
-
-# Generated outputs
 *.log
-.DS_Store
+
+# Raw source data and large processed data
+/data/raw/*
+!/data/raw/.gitkeep
+/data/processed/*
+!/data/processed/.gitkeep
+/data/ecommerce_funnel_events.csv
+/data/transformed/
+
+# Keep small dashboard reports trackable
+!reports/*.csv
+!reports/*.json
+!reports/*.png

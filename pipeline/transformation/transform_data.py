@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_OUTPUT = ROOT / "data" / "ecommerce_funnel_events.csv"
+DEFAULT_OUTPUT = ROOT / "data" / "processed" / "ecommerce_funnel_events_normalized.csv"
 EVENT_STAGE_MAP = {"view": "product_view", "addtocart": "cart", "transaction": "purchase"}
 
 
@@ -22,23 +22,20 @@ def transform_retailrocket(events_path: Path, output_path: Path = DEFAULT_OUTPUT
     frame["event_timestamp"] = pd.to_datetime(frame["timestamp"], unit="ms", utc=True).dt.strftime("%Y-%m-%dT%H:%M:%SZ")
     frame["stage"] = frame["event"].map(EVENT_STAGE_MAP)
 
-    rows = []
-    for event_id, row in enumerate(frame.itertuples(index=False), start=1):
-        purchase = row.stage == "purchase"
-        rows.append({
-            "event_id": f"EVT-{event_id:07d}",
-            "user_id": f"VIS-{int(row.visitorid):08d}",
-            "session_id": f"SES-{int(row.visitorid):08d}",
-            "event_timestamp": row.event_timestamp,
-            "campaign": "unknown",
-            "channel": "unknown",
-            "device": "unknown",
-            "stage": row.stage,
-            "cart_value": "1.00" if purchase else "0.00",
-            "revenue": "1.00" if purchase else "0.00",
-        })
+    purchase_mask = frame["stage"] == "purchase"
 
-    result = pd.DataFrame(rows)
+    result = pd.DataFrame({
+        "event_id": [f"EVT-{event_id:07d}" for event_id in range(1, len(frame) + 1)],
+        "user_id": "VIS-" + frame["visitorid"].astype("int64").astype(str).str.zfill(8),
+        "session_id": "SES-" + frame["visitorid"].astype("int64").astype(str).str.zfill(8),
+        "event_timestamp": frame["event_timestamp"].to_numpy(),
+        "campaign": "unknown",
+        "channel": "unknown",
+        "device": "unknown",
+        "stage": frame["stage"].to_numpy(),
+        "cart_value": purchase_mask.map({True: "1.00", False: "0.00"}).to_numpy(),
+        "revenue": purchase_mask.map({True: "1.00", False: "0.00"}).to_numpy(),
+    })
     output_path.parent.mkdir(parents=True, exist_ok=True)
     result.to_csv(output_path, index=False)
     return result

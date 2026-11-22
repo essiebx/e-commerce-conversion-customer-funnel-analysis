@@ -9,7 +9,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
-DEFAULT_OUTPUT = DATA_DIR / "ecommerce_funnel_events.csv"
+DEFAULT_OUTPUT = DATA_DIR / "processed" / "ecommerce_funnel_events_normalized.csv"
 RETAILROCKET_URL = "https://raw.githubusercontent.com/benfred/recommenders/master/data/ecommerce-events.zip"
 
 EVENT_STAGE_MAP = {

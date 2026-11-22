@@ -1,0 +1,17 @@
+{
+  "generated_at_utc": "2026-11-22T10:26:52.688500+00:00",
+  "source_file": "data/processed/ecommerce_funnel_events_clean.csv",
+  "source_rows": 2756101,
+  "unique_users": 1407580,
+  "stages": [
+    "product_view",
+    "cart",
+    "purchase"
+  ],
+  "reports": [
+    "funnel_summary.csv",
+    "segment_summary.csv",
+    "revenue_opportunity.csv",
+    "funnel_conversion.png"
+  ]
+}
