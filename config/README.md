@@ -1,5 +1,5 @@
 # Configuration
 
-`pipeline.yaml` documents the default source, output locations, valid funnel stages, and synthetic data settings.
+`pipeline.yaml` documents the default source, output locations, and valid funnel stages.
 
-The current Python entry point defaults to the Retailrocket source. Pass `--source synthetic` to generate demonstration data.
+The Python entry point uses the RetailRocket source by default. Supply `--events-file` to select another RetailRocket `events.csv` file.

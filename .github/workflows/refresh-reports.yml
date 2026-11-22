@@ -1,0 +1,48 @@
+name: Refresh funnel reports
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Generate report contract
+        run: |
+          if [ -f "data/raw/retailrocket/events.csv" ]; then
+            python pipeline/orchestration/run_pipeline.py --events-file data/raw/retailrocket/events.csv
+          elif [ -f "data/raw/events.csv" ]; then
+            python pipeline/orchestration/run_pipeline.py --events-file data/raw/events.csv
+          else
+            echo "No source events.csv is available in the repository."
+            echo "For public deployment, commit only generated reports or configure source storage."
+            exit 1
+          fi
+          python scripts/analyze_funnel.py
+
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Commit refreshed reports
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: refresh funnel reports"
+          file_pattern: reports/**

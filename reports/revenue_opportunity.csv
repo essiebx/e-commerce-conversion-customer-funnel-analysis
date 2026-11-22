@@ -1,0 +1,3 @@
+from_stage,to_stage,abandoned_users,estimated_avg_purchase,estimated_recovery_opportunity
+product_view,cart,1369778,1.0,1369778.0
+cart,purchase,27146,1.0,27146.0

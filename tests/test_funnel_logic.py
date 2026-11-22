@@ -34,6 +34,22 @@ class FunnelLogicTests(unittest.TestCase):
         opportunity = revenue_opportunity(self.frame)
         self.assertEqual(len(opportunity), 4)
 
+    def test_chronological_funnel_excludes_purchase_before_cart(self):
+        frame = pd.DataFrame([
+            {"user_id": "1", "campaign": "A", "channel": "search", "device": "mobile", "stage": "landing", "cart_value": 0, "revenue": 0, "event_timestamp": "2026-01-01T00:00:00Z"},
+            {"user_id": "1", "campaign": "A", "channel": "search", "device": "mobile", "stage": "product_view", "cart_value": 0, "revenue": 0, "event_timestamp": "2026-01-01T00:01:00Z"},
+            {"user_id": "1", "campaign": "A", "channel": "search", "device": "mobile", "stage": "cart", "cart_value": 100, "revenue": 0, "event_timestamp": "2026-01-01T00:02:00Z"},
+            {"user_id": "1", "campaign": "A", "channel": "search", "device": "mobile", "stage": "purchase", "cart_value": 100, "revenue": 100, "event_timestamp": "2026-01-01T00:03:00Z"},
+            {"user_id": "2", "campaign": "A", "channel": "search", "device": "mobile", "stage": "landing", "cart_value": 0, "revenue": 0, "event_timestamp": "2026-01-01T00:00:00Z"},
+            {"user_id": "2", "campaign": "A", "channel": "search", "device": "mobile", "stage": "product_view", "cart_value": 0, "revenue": 0, "event_timestamp": "2026-01-01T00:01:00Z"},
+            {"user_id": "2", "campaign": "A", "channel": "search", "device": "mobile", "stage": "purchase", "cart_value": 100, "revenue": 100, "event_timestamp": "2026-01-01T00:02:00Z"},
+        ])
+        frame = pd.concat([frame], ignore_index=True)
+        frame["event_timestamp"] = pd.to_datetime(frame["event_timestamp"], utc=True)
+        summary = funnel_summary(frame)
+        purchase_users = int(summary.loc[summary["stage"] == "purchase", "users"].iloc[0])
+        self.assertEqual(purchase_users, 1)
+
 
 if __name__ == "__main__":
     unittest.main()

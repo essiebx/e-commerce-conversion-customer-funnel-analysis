@@ -1,7 +1,7 @@
 source:
   type: retailrocket
   raw_directory: data/raw
-  normalized_output: data/ecommerce_funnel_events.csv
+  normalized_output: data/processed/ecommerce_funnel_events_normalized.csv
 
 cleaning:
   processed_output: data/processed/ecommerce_funnel_events_clean.csv
@@ -11,7 +11,3 @@ cleaning:
     - cart
     - checkout
     - purchase
-
-synthetic:
-  users: 5000
-  seed: 42

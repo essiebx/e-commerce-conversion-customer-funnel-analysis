@@ -1,0 +1,4 @@
+stage,users,step_conversion_rate,overall_conversion_rate,drop_off_users,drop_off_rate
+product_view,1404179,1.0,1.0,0,0.0
+cart,32272,0.023,0.023,1371907,0.977
+purchase,9956,0.3085,0.0071,22316,0.6915
